@@ -17,7 +17,7 @@ const Product = (props) => {
                 <p className='product-name'>{name}</p>
                 <p>price: ${price}</p>
                 <p><small>seller:{seller} </small></p>
-                <p><small>Rating:{ratings} starts </small></p>
+                <p><small>Rating:{ratings} stars </small></p>
 
             </div>
             <button onClick={addToCart} className='btn-cart'>

@@ -1,23 +1,39 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import useCart from '../../hook/useCart';
+import { addToDb, getStoredCard } from '../../utilities/fakedb';
 import Cart from '../Cart/Cart';
+import useProducts from '../hook/useProduct';
 import Product from '../Product/Product';
 import './Shop.css';
 
 const Shop = () => {
-    const [cart, setCart] = useState([])
-    const [products, setProducts] = useState([]);
 
-    useEffect(() => {
-        fetch('https://raw.githubusercontent.com/ProgrammingHero1/ema-john-resources/main/fakeData/products.json')
-            .then(res => res.json())
-            .then(data => setProducts(data))
-    }, []);
+    const [products, setProducts] = useProducts();
+    const [cart, setCart] = useCart(products)
 
-    const addToCart = (product) => {
-        console.log(product)
-        const newCart = [...cart, product];
+
+
+
+
+    const addToCart = (SelectedProduct) => {
+        console.log(SelectedProduct);
+        let newCart = [];
+        const exist = cart.find(product => product.id === SelectedProduct.id);
+        if (!exist) {
+            SelectedProduct.quantity = 1;
+            newCart = [...cart, SelectedProduct];
+        } else {
+            const rest = cart.filter(product => product.id !== SelectedProduct.id);
+            SelectedProduct.quantity = exist.quantity + 1;
+            newCart = [...rest, exist]
+        }
+
         setCart(newCart)
-    }
+
+        addToDb(SelectedProduct.id);
+    };
+
     return (
         <div className='shop-container'>
             <div className="product-containers">
@@ -27,11 +43,13 @@ const Shop = () => {
             </div>
 
             <div className="cart-containers">
-                <h3>order summery</h3>
-                <h3>selected item: {cart.length} </h3>
-                {
-                    cart.map(theCart => <Cart name={theCart.name} price={theCart.price}></Cart>)
-                }
+
+
+                <Cart cart={cart} carts={cart.length}>
+                    <h2>this is shop</h2>
+                    <Link to="/order"> <button>go to shop</button></Link>
+
+                </Cart>
             </div>
         </div>
     );
@@ -41,3 +59,43 @@ const Shop = () => {
 
 
 export default Shop;
+
+
+
+
+
+/* ------------------------------------------------- */
+
+/* 
+
+ useEffect(() => {
+        console.log('loacal storage first line ', products)
+        const storedCard = getStoredCard();
+        const savedCart = [];
+        console.log(storedCard)
+        for (const id in storedCard) {
+            const addedProduct = products.find(product => product.id === id);
+
+            if (addedProduct) {
+                const quantity = storedCard[id];
+                addedProduct.quantity = quantity;
+
+                savedCart.push(addedProduct);
+
+                console.log(addedProduct);
+
+            }
+            setCart(savedCart)
+
+        }
+    }, [products])
+
+*/
+
+
+
+/* 
+
+https://raw.githubusercontent.com/ProgrammingHero1/ema-john-resources/main/fakeData/products.json
+
+*/
